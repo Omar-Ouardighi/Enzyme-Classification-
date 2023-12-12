@@ -9,6 +9,6 @@
 #SBATCH --qos normal
 
 
-conda activate MONAI-BRATS
+conda activate transformer
 nvidia-smi
 python main.py
