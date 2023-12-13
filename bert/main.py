@@ -53,8 +53,8 @@ train.LABEL = le.fit_transform(train.LABEL)[:,0]
 train, valid = train_test_split(train, test_size = 0.2, shuffle = True, stratify = train.LABEL, random_state = 42)
 
 
-tds = Dataset.from_pandas(train[["SEQUENCE", "LABEL"]]).select(range(10000))
-vds = Dataset.from_pandas(valid[["SEQUENCE", "LABEL"]]).select(range(10000))
+tds = Dataset.from_pandas(train[["SEQUENCE", "LABEL"]])
+vds = Dataset.from_pandas(valid[["SEQUENCE", "LABEL"]])
 
 
 ds = DatasetDict()
@@ -124,7 +124,8 @@ model.print_trainable_parameters() # see % trainable parameters
 
 
  # Train the model
-training_args = TrainingArguments(output_dir="bert-peft", evaluation_strategy="epoch", num_train_epochs=2)
+training_args = TrainingArguments(output_dir="bert-peft-t", num_train_epochs=2, logging_strategy ="epoch", save_strategy ="epoch", save_total_limit=2,
+                                 load_best_model_at_end=True, evaluation_strategy="epoch", per_device_train_batch_size=32, per_device_eval_batch_size=32)
 bert_peft_trainer = Trainer(
     model=model,
     args=training_args,
