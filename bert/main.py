@@ -11,8 +11,7 @@ import evaluate
 from datasets import Dataset, DatasetDict
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from transformers import TrainingArguments, Trainer
-from peft import LoraConfig, get_peft_model, TaskType
-from peft import PeftModel
+
 
 
 train = pd.read_csv('./train.csv')
@@ -105,35 +104,21 @@ model = AutoModelForSequenceClassification.from_pretrained(model_name, num_label
 print(model)
 
 
-# Define LoRA Config
-lora_config = LoraConfig(
- r=16,
- lora_alpha=32,
- target_modules=["query", "value"],
- lora_dropout=0.05,
- bias="none",
- task_type=TaskType.SEQ_CLS, # this is necessary
- inference_mode=True
-)
-
-# add LoRA adaptor
-model = get_peft_model(model, lora_config)
-model.print_trainable_parameters() # see % trainable parameters
 
 
 
 
  # Train the model
-training_args = TrainingArguments(output_dir="bert-peft-t", num_train_epochs=2, logging_strategy ="epoch", save_strategy ="epoch", save_total_limit=2,
-                                 load_best_model_at_end=True, evaluation_strategy="epoch", per_device_train_batch_size=32, per_device_eval_batch_size=32)
-bert_peft_trainer = Trainer(
+training_args = TrainingArguments(output_dir="bert-trainer", num_train_epochs=1, logging_strategy ="epoch", save_strategy ="epoch", 
+                                 load_best_model_at_end=True, evaluation_strategy="epoch", per_device_train_batch_size=8, per_device_eval_batch_size=8)
+bert_trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=tokenized_train_dataset, # training dataset requires column input_ids
     eval_dataset=tokenized_eval_dataset,
     compute_metrics=compute_metrics,
 )
-bert_peft_trainer.train()
+bert_trainer.train()
 
 
 
